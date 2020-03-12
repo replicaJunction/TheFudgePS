@@ -1,22 +1,24 @@
 function Get-Rules {
     param(
+        [Parameter(Position = 0)]
+        [String] $Path
+        ,
+
         [Parameter()]
         [Switch] $Force
     )
 
-    if (-not $Force -and (Get-Variable -Name 'rules' -Scope 'script' -ValueOnly -ErrorAction SilentlyContinue)) {
-        return $script:rules
+    $p = Get-ModulePrivateData
+    if (-not $Force) {
+        return $p.Rules
     }
 
-    # $script:rules = Get-ChildItem $script:rulesPath -Filter "*.rules.json" |
-    #     ForEach-Object -Parallel {
-    #         Get-Content $_ | ConvertFrom-Json
-    #     }
-    $script:rules = New-Object -TypeName 'System.Collections.Generic.List[System.Management.Automation.ScriptBlock]'
-    Get-ChildItem $script:rulesPath -Filter "*.rules.ps1" |
+    Get-ChildItem $Path -Filter "*.rules.ps1" |
         ForEach-Object {
-            . $_.FullName | ForEach-Object { $script:rules.Add($_) }
+            . $_.FullName | ForEach-Object { $p.Rules.Add($_) }
         }
 
-    return $script:rules
+    Set-ModulePrivateData $p
+
+    return $p.Rules
 }

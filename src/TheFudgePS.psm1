@@ -18,4 +18,4 @@ Export-ModuleMember -Function ($PublicFunctions | Select-Object -ExpandProperty 
 # Export aliases
 Export-ModuleMember -Alias 'fudge'
 
-$script:rulesPath = Join-Path -Path $PSScriptRoot -ChildPath 'Rules'
+Get-Rules -Path "$PSScriptRoot\Rules" -Force

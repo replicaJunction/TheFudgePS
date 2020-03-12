@@ -2,14 +2,17 @@ function Get-ModulePrivateData {
     [CmdletBinding()]
     param()
 
-    $defaultPrivateData = @{}
+    [hashtable] $p = $MyInvocation.MyCommand.Module.PrivateData
+    [bool] $isDirty = $false
 
-    $p = $MyInvocation.MyCommand.Module.PrivateData
+    # Create default entries if they don't exist
 
-    if (-not $p) {
-        # If no PrivateData exists, set it to a default value. This way, the user
-        # can reference it without a NullReferenceException
-        $p = $defaultPrivateData
+    if (-not $p.ContainsKey('Rules')) {
+        $p['Rules'] = New-Object -TypeName 'System.Collections.Generic.List[System.Management.Automation.ScriptBlock]'
+        $isDirty = $true
+    }
+
+    if ($isDirty) {
         $MyInvocation.MyCommand.Module.PrivateData = $p
     }
 

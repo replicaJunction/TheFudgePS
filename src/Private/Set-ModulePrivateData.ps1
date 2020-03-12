@@ -1,4 +1,3 @@
-
 function Set-ModulePrivateData {
     [CmdletBinding()]
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSUseShouldProcessForStateChangingFunctions", "")]
