@@ -1,0 +1,79 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "windows": {
+        "options": {
+            "shell": {
+                "executable": "${env:ProgramFiles}/PowerShell/7/pwsh.exe",
+                "args": [
+                    "-NoProfile",
+                    "-ExecutionPolicy Bypass",
+                    "-Command "
+                ]
+            }
+        }
+    },
+    "linux": {
+        "options": {
+            "shell": {
+                "executable": "/usr/bin/powershell",
+                "args": [
+                    "-NoProfile",
+                    "-Command "
+                ]
+            }
+        }
+    },
+    "osx": {
+        "options": {
+            "shell": {
+                "executable": "/usr/local/bin/powershell",
+                "args": [
+                    "-NoProfile",
+                    "-Command "
+                ]
+            }
+        }
+    },
+    "tasks": [
+        {
+            "label": "Build",
+            "type": "shell",
+            "command": "& '${workspaceRoot}\\build\\build.ps1' -SkipDependencyCheck",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },
+        {
+            "label": "Build (Verbose)",
+            "type": "shell",
+            "command": "& '${workspaceRoot}\\build\\build.ps1' -SkipDependencyCheck -Verbose",
+            "group": "build",
+            "problemMatcher": []
+        },
+        {
+            "label": "Build (check and install dependencies)",
+            "type": "shell",
+            "command": "& '${workspaceRoot}\\build\\build.ps1' -Verbose",
+            "group": "build",
+            "problemMatcher": []
+        },
+        {
+            "label": "Test",
+            "type": "shell",
+            "command": "& '${workspaceRoot}\\test\\Invoke-Test.ps1' -VSCode",
+            "group": "test",
+            "problemMatcher": "$pester",
+            "presentation": {
+                "echo": false,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared",
+                "showReuseMessage": true,
+                "clear": false
+            }
+        }
+    ]
+}

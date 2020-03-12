@@ -1,0 +1,27 @@
+{
+    "title": "TheFudgePS rules file",
+    "description": "Rules used by TheFudgePS",
+    "type": "object",
+    "properties": {
+        "commandLineRules": {
+            "description": "Rules matching the full command line of a command to correct",
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "commandLine": {
+                        "description": "Command line that was entered (regex)",
+                        "type": "string"
+                    },
+                    "replaceWith": {
+                        "description": "Exact text to enter as a replacement for the above",
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "commandLine"
+                ]
+            }
+        }
+    }
+}
