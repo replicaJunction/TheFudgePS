@@ -8,14 +8,6 @@ function Invoke-Fudge {
         $command = $lastHistory.CommandLine
         $rules = Get-Rules
 
-        # $matchingRule = $rules |
-        #     ForEach-Object {
-        #         if ($_.PSObject.Properties.Name -contains 'commandLineRules') {
-        #             $_.commandLineRules | Where-Object { $command -match $_.commandLine }
-        #         }
-        #     } |
-        #     Select-Object -First 1
-
         $result = $null
         foreach ($r in $rules) {
             $result = & $r $command $lastExit

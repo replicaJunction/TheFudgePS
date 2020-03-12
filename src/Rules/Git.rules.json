@@ -1,8 +1,0 @@
-{
-    "commandLineRules": [
-        {
-            "commandLine": "^git stats",
-            "replaceWith": "git status"
-        }
-    ]
-}
