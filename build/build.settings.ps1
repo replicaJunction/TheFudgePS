@@ -4,7 +4,7 @@
 # Customize these properties and tasks for your module.
 ###############################################################################
 
-# Settings for build script version 2.0.2
+# Settings for build script version 2.0.3
 
 # BuildHelpers makes these variables available:
 #
@@ -17,13 +17,24 @@
 # BHProjectPath         - Path to the root of the project
 # BHPSModuleManifest    - Path to the module manifest (.psd1) file
 
+# Folders which should be included in the merged module
+[System.Diagnostics.CodeAnalysis.SuppressMessage('PSUseDeclaredVarsMoreThanAssigments', '')]
+$CombineModuleFolders = @(
+    'Private'
+    'Public'
+)
+
 # Additional files which should be copied - config files, etc.
 [System.Diagnostics.CodeAnalysis.SuppressMessage('PSUseDeclaredVarsMoreThanAssigments', '')]
-$ExtraFilesToCopy = @()
+$ExtraFilesToCopy = @('Rules')
 
 # Any additional logic that needs to be in the module file
 [System.Diagnostics.CodeAnalysis.SuppressMessage('PSUseDeclaredVarsMoreThanAssigments', '')]
-$ExtraModuleContent = 'Set-StrictMode -Version Latest'
+$ExtraModuleContent = @'
+Set-StrictMode -Version Latest
+
+Get-Rules -Path "$PSScriptRoot\Rules" -Force
+'@
 
 # Directory where build artifacts will be placed, including the "compiled" module and report files.
 # Note - if you change this, you may want to change the path in the .gitignore file as well.

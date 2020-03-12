@@ -4,7 +4,7 @@
 ##############################################################################
 
 # This is an Invoke-Build build script.
-# Version 2.0.2
+# Version 2.0.3
 
 Set-StrictMode -Version Latest
 
@@ -64,12 +64,16 @@ Task CreateMergedModule Init, {
     "" | Out-File $ArtifactPsm1File -Encoding UTF8 -Force
 
     Write-Verbose "Creating compiled module file at path $ArtifactPsm1File"
-    Get-ChildItem -Path $BHModulePath -Filter "*.ps1" -Recurse | ForEach-Object {
-        Write-Verbose "  * $($_.FullName)"
-        $thisAst = [System.Management.Automation.Language.Parser]::ParseFile($_.FullName, [ref]$null, [ref]$null)
-        $functions = $thisAst.EndBlock.Extent.Text + "`n"
-        Write-Output $functions
-    } | Add-Content $ArtifactPsm1File
+    $CombineModuleFolders |
+        ForEach-Object { Join-Path -Path $BHModulePath -ChildPath $_ } |
+        Get-ChildItem -Filter "*.ps1" -Recurse |
+        ForEach-Object {
+            Write-Verbose "  * $($_.FullName)"
+            $thisAst = [System.Management.Automation.Language.Parser]::ParseFile($_.FullName, [ref]$null, [ref]$null)
+            $functions = $thisAst.EndBlock.Extent.Text + "`n"
+            Write-Output $functions
+        } |
+        Add-Content $ArtifactPsm1File
 
     if ($ExtraModuleContent) {
         "$ExtraModuleContent".Trim() | Add-Content $ArtifactPsm1File
@@ -79,15 +83,20 @@ Task CreateMergedModule Init, {
 Task CopyFiles 'Init', {
     Write-Verbose "Checking for extra files in output directory"
     Get-ChildItem -Path $ArtifactModulePath -File |
-    Where-Object { -not (Get-ChildItem -Path $BHModulePath -Filter $_.Name ) } |
-    ForEach-Object { Write-Verbose "Removing extra file $($_.Name)"; $_ } |
-    Remove-Item -Force
+        Where-Object { -not (Get-ChildItem -Path $BHModulePath -Filter $_.Name ) } |
+        ForEach-Object { Write-Verbose "Removing extra file $($_.Name)"; $_ } |
+        Remove-Item -Force
 
-    Write-Verbose "Copying additional files to module output directory"
-    Get-ChildItem -Path $BHModulePath -File |
-    Where-Object { $_.Name -ne "$BHProjectName.psm1" } |
-    ForEach-Object { Write-Verbose "Copying file $($_.Name)"; $_ } |
-    Copy-Item -Destination $ArtifactModulePath -Force
+    if ($ExtraFilesToCopy) {
+        $ExtraFilesToCopy |
+            ForEach-Object { Join-Path -Path $BHModulePath -ChildPath $_ } |
+            Copy-Item -Destination $ArtifactModulePath -Force -Recurse
+    }
+    # Write-Verbose "Copying additional files to module output directory"
+    # Get-ChildItem -Path $BHModulePath -File |
+    #     Where-Object { $_.Name -ne "$BHProjectName.psm1" } |
+    #     ForEach-Object { Write-Verbose "Copying file $($_.Name)"; $_ } |
+    #     Copy-Item -Destination $ArtifactModulePath -Force
 }
 
 Task UpdateManifestFunctions Init, CopyFiles, CreateMergedModule, {
